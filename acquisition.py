@@ -53,7 +53,8 @@ def process_format(array):
 
 def iris_crop(image_name, iris_details, counter):
 
-    image = cv2.imread(image_name)
+    # read image as grayscale
+    image = cv2.imread(image_name, 0)
 
     # get top_left and bottom_right coordinates using the radius
     x1 = int(iris_details[counter][0]) - int(iris_details[counter][2])
@@ -105,15 +106,15 @@ def divide_datasets(array):
         label += 1
 
     # convert to numpy arrays
-    training_set = np.asarray(training_set, dtype=np.uint8).reshape((800, 128, 128, 3))
+    training_set = np.asarray(training_set, dtype=np.uint8).reshape((800, 128, 128))
     training_set = normalize(training_set)
     training_set_labels = np.asarray(training_set_labels, dtype=np.int).reshape(-1, 1)
 
-    validation_set = np.asarray(validation_set, dtype=np.uint8).reshape((400, 128, 128, 3))
+    validation_set = np.asarray(validation_set, dtype=np.uint8).reshape((400, 128, 128))
     validation_set = normalize(validation_set)
     validation_set_labels = np.asarray(validation_set_labels, dtype=np.int).reshape(-1, 1)
 
-    testing_set = np.asarray(testing_set, dtype=np.uint8).reshape((400, 128, 128, 3))
+    testing_set = np.asarray(testing_set, dtype=np.uint8).reshape((400, 128, 128))
     testing_set = normalize(testing_set)
     testing_set_labels = np.asarray(testing_set_labels, dtype=np.int).reshape(-1, 1)
 

@@ -7,7 +7,7 @@ def create_model(num_extra_conv_layers, init_num_kernels, init_kernel_size, init
     model = tf.keras.models.Sequential(name=model_name)
 
     # add input layer (128x128) grayscale images
-    model.add(tf.keras.layers.InputLayer(input_shape=[128, 128, 3], name='input_layer'))
+    model.add(tf.keras.layers.InputLayer(input_shape=[128, 128, 1], name='input_layer'))
 
     """
     parameters for convolutional layer:
@@ -74,7 +74,7 @@ def create_model(num_extra_conv_layers, init_num_kernels, init_kernel_size, init
         model.add(tf.keras.layers.BatchNormalization())
         # add dropout layer with probability of 50% as seen in Hands-On Machine Learning with SciKit-Learn, Tensorflow
         # and Keras pg 473
-        model.add(tf.keras.layers.Dropout(0.5, seed=SEED, name=f'dropout_layer_{num}'))
+        model.add(tf.keras.layers.Dropout(rate=0.5, seed=SEED, name=f'dropout_layer_{num}'))
         # init_num_neurons_fc_layer /= 2
         num += 1
 
