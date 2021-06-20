@@ -3,11 +3,11 @@ SEED = 1
 
 
 def create_model(num_extra_conv_layers, init_num_kernels, init_kernel_size, init_num_neurons_fc_layer=128,
-                 num_of_fc_layers=1, strides=1):
-    model = tf.keras.models.Sequential()
+                 num_of_fc_layers=1, strides=1, model_name='base_model'):
+    model = tf.keras.models.Sequential(name=model_name)
 
     # add input layer (128x128) grayscale images
-    model.add(tf.keras.layers.InputLayer(input_shape=[128, 128, 1], name='Input Layer'))
+    model.add(tf.keras.layers.InputLayer(input_shape=[128, 128, 3], name='input_layer'))
 
     """
     parameters for convolutional layer:
@@ -23,13 +23,15 @@ def create_model(num_extra_conv_layers, init_num_kernels, init_kernel_size, init
     # weight initializer
     initializer = tf.keras.initializers.he_normal(seed=SEED)
     # add at-least 2 convolutional layers
-    # 2 conv layers has stride of 1 so no zero-padding. padding='valid' means no zero-padding, 'same' means otherwise
+    # 2 conv layers has stride of 1 so do zero-padding. padding='valid' means no zero-padding, 'same' means otherwise
     num = 1
     for i in range(2):
         # add Convolutional layer
         model.add(tf.keras.layers.Conv2D(filters=init_num_kernels, kernel_size=init_kernel_size, strides=1,
-                                         padding='valid', activation='relu', kernel_initializer=initializer,
+                                         padding='same', activation='relu', kernel_initializer=initializer,
                                          name=f'conv_{num}'))
+        # add Batch Normalization Layer
+        model.add(tf.keras.layers.BatchNormalization())
         # add max-pooling layer. Kernel size of 2x2 and stride of 2
         model.add(tf.keras.layers.MaxPool2D(pool_size=2, padding='same', name=f'maxpool_{num}'))
         # double number of kernels
@@ -42,14 +44,16 @@ def create_model(num_extra_conv_layers, init_num_kernels, init_kernel_size, init
     # add extra convolutional layers if specified
     for i in range(num_extra_conv_layers):
         if strides > 1:
-            # add zero padding
+            # don't add zero padding
             model.add(tf.keras.layers.Conv2D(filters=init_num_kernels, kernel_size=init_kernel_size, strides=strides,
-                                             padding='same', activation='relu', kernel_initializer=initializer,
+                                             padding='valid', activation='relu', kernel_initializer=initializer,
                                              name=f'conv_{num}'))
         else:
             model.add(tf.keras.layers.Conv2D(filters=init_num_kernels, kernel_size=init_kernel_size, strides=1,
-                                             padding='valid', activation='relu', kernel_initializer=initializer,
+                                             padding='same', activation='relu', kernel_initializer=initializer,
                                              name=f'conv_{num}'))
+        # add Batch Normalization Layer
+        model.add(tf.keras.layers.BatchNormalization())
         # add max-pooling layer. Kernel size of 2x2 and stride of 2
         model.add(tf.keras.layers.MaxPool2D(pool_size=2, padding='same', name=f'maxpool_{num}'))
         # double number of kernels
@@ -66,7 +70,8 @@ def create_model(num_extra_conv_layers, init_num_kernels, init_kernel_size, init
     for i in range(num_of_fc_layers):
         model.add(tf.keras.layers.Dense(units=init_num_neurons_fc_layer, activation='relu',
                                         kernel_initializer=initializer, name=f'FC_layer_{num}'))
-
+        # add Batch Normalization Layer
+        model.add(tf.keras.layers.BatchNormalization())
         # add dropout layer with probability of 50% as seen in Hands-On Machine Learning with SciKit-Learn, Tensorflow
         # and Keras pg 473
         model.add(tf.keras.layers.Dropout(0.5, seed=SEED, name=f'dropout_layer_{num}'))

@@ -1,5 +1,6 @@
 import models as m
 import os
+import acquisition as aq
 
 
 def print_equal():
@@ -46,22 +47,22 @@ def evaluate_model(model: m.tf.keras.Model, test_x, test_y):
 
 
 def main():
+    # get data from acquisition
+    train_x, train_y, val_x, val_y, test_x, test_y = aq.data_acquisition()
+
     # create base model with 2 Conv layers and 1 fully-connected layer
-    base_model = m.create_model(num_extra_conv_layers=0, init_num_kernels=64, init_kernel_size=7)
+    base_model = m.create_model(num_extra_conv_layers=0, init_num_kernels=32, init_kernel_size=7)
     learning_rate = 1e-3
     m.compile_model(base_model, learning_rate)
 
-    # get data from acquisition
-    train_x = [], train_y = []
-    val_x = [], val_y = []
-    test_x = [], test_y = []
-
     # train model
-    epochs = 150  # max epochs, ealry stopping may cause training to stop earlier
-    batch_size = 64
-    train(base_model, epochs, batch_size, train_x, train_y, val_x, val_y, exp_name='base_model')
+    epochs = 150  # max epochs, early stopping may cause training to stop earlier
+    batch_size = 32
 
-    # evaluate model
+    print(f'{print_equal()} Training {print_equal()}')
+    train(base_model, epochs, batch_size, train_x, train_y, val_x, val_y, exp_name='base_model')
+    #
+    # # evaluate model
     evaluate_model(base_model, test_x, test_y)
 
 
