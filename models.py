@@ -3,7 +3,7 @@ SEED = 1
 
 
 def create_model(num_extra_conv_layers, init_num_kernels, init_kernel_size, init_num_neurons_fc_layer=128,
-                 num_of_fc_layers=1, strides=1, model_name='base_model'):
+                 num_of_fc_layers=2, strides=1, model_name='base_model'):
     model = tf.keras.models.Sequential(name=model_name)
 
     # add input layer (128x128) grayscale images
@@ -57,24 +57,26 @@ def create_model(num_extra_conv_layers, init_num_kernels, init_kernel_size, init
         # add max-pooling layer. Kernel size of 2x2 and stride of 2
         model.add(tf.keras.layers.MaxPool2D(pool_size=2, padding='same', name=f'maxpool_{num}'))
         # double number of kernels
-        init_num_kernels *= 2
+        # init_num_kernels *= 2
         # decrease the kernel size
-        init_kernel_size -= 2
+        # init_kernel_size -= 2
         # increase variable for naming
         num += 1
 
     # Flatten MaxPool output before connecting to Fully Connected layers
     model.add(tf.keras.layers.Flatten())
     num = 1
-    # default is 1 fully connected layer
+    # default is 2 fully connected layer
     for i in range(num_of_fc_layers):
         model.add(tf.keras.layers.Dense(units=init_num_neurons_fc_layer, activation='relu',
-                                        kernel_initializer=initializer, name=f'FC_layer_{num}'))
+                                        kernel_initializer=initializer, name=f'fc_layer_{num}'))
         # add Batch Normalization Layer
         model.add(tf.keras.layers.BatchNormalization())
         # add dropout layer with probability of 50% as seen in Hands-On Machine Learning with SciKit-Learn, Tensorflow
         # and Keras pg 473
         model.add(tf.keras.layers.Dropout(0.5, seed=SEED, name=f'dropout_layer_{num}'))
+        # init_num_neurons_fc_layer /= 2
+        num += 1
 
     soft_initializer = tf.keras.initializers.glorot_normal(seed=SEED)
     # connect with softmax layer for classification. We have 400 subjects, therefore 400 neurons
@@ -97,6 +99,6 @@ def compile_model(model: tf.keras.Model, learning_rate):
     :return:
     """
     # compile model, returns None
-    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
+    model.compile(optimizer=tf.keras.optimizers.RMSprop(learning_rate=learning_rate),
                   loss=tf.keras.losses.SparseCategoricalCrossentropy(),
                   metrics=tf.keras.metrics.SparseCategoricalAccuracy())

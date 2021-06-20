@@ -21,7 +21,7 @@ def train(model: m.tf.keras.Model, epochs, batch_size, train_x, train_y, val_x, 
         # validation set(save_best_only=True)
         m.tf.keras.callbacks.ModelCheckpoint('iris_deep_model.h5', save_best_only=True),
         # perform early stopping when there's no increase in performance on the validation set in (patience) epochs
-        m.tf.keras.callbacks.EarlyStopping(patience=10, restore_best_weights=True),
+        # m.tf.keras.callbacks.EarlyStopping(patience=10, restore_best_weights=True),
         # tensorboard callback
         m.tf.keras.callbacks.TensorBoard(run_logdir)
     ]
@@ -51,7 +51,7 @@ def main():
     train_x, train_y, val_x, val_y, test_x, test_y = aq.data_acquisition()
 
     # create base model with 2 Conv layers and 1 fully-connected layer
-    base_model = m.create_model(num_extra_conv_layers=0, init_num_kernels=32, init_kernel_size=7)
+    base_model = m.create_model(num_extra_conv_layers=0, init_num_kernels=3, init_kernel_size=3)
     learning_rate = 1e-3
     m.compile_model(base_model, learning_rate)
 
@@ -60,10 +60,10 @@ def main():
     batch_size = 32
 
     print(f'{print_equal()} Training {print_equal()}')
-    train(base_model, epochs, batch_size, train_x, train_y, val_x, val_y, exp_name='base_model')
+    # train(base_model, epochs, batch_size, train_x, train_y, val_x, val_y, exp_name='base_model')
     #
     # # evaluate model
-    evaluate_model(base_model, test_x, test_y)
+    # evaluate_model(base_model, test_x, test_y)
 
 
 if __name__ == '__main__':
