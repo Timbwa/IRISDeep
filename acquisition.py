@@ -58,11 +58,11 @@ def iris_crop(image_name, iris_details, counter):
 
     # get top_left and bottom_right coordinates using the radius
     x1 = int(iris_details[counter][0]) - int(iris_details[counter][2])
-    y1 = int(iris_details[counter][1]) + int(iris_details[counter][2])
+    y1 = int(iris_details[counter][1]) - int(iris_details[counter][2])
     x2 = int(iris_details[counter][0]) + int(iris_details[counter][2])
-    y2 = int(iris_details[counter][1]) - int(iris_details[counter][2])
+    y2 = int(iris_details[counter][1]) + int(iris_details[counter][2])
 
-    cropped_image = image[y2:y1, x1:x2]
+    cropped_image = image[x1:x2, y1:y2]
     cropped_image = cv2.resize(cropped_image, (128, 128))
 
     return cropped_image
@@ -88,24 +88,54 @@ def divide_datasets(array):
 
     label = 0
 
-    for i in range(0, len(array), 4):
-        # 1 sample from session 01 and 1 sample from session 02 go into training set
-        training_set.append(array[i])
-        training_set.append(array[i + 2])
+    # read images as groups of 8
+    for i in range(0, len(array), 8):
+        # Person_1 (User 1, left eye samples)
+        left_eye_sess_1_num_1 = array[i]
+        left_eye_sess_1_num_2 = array[i + 1]
+        left_eye_sess_2_num_1 = array[i + 4]
+        left_eye_sess_2_num_2 = array[i + 5]
 
-        # 1 other sample from session 01 for validation and the other from session 02 for testing
-        validation_set.append(array[i + 1])
-        testing_set.append(array[i + 3])
+        # Person_2 (User 1, right eye samples)
+        right_eye_sess_1_num_1 = array[i + 2]
+        right_eye_sess_1_num_2 = array[i + 3]
+        right_eye_sess_2_num_1 = array[i + 6]
+        right_eye_sess_2_num_2 = array[i + 7]
 
+        # append one eye from sess_1 and one eye from sess_2 to the training set
+        # person 1
+        training_set.append(left_eye_sess_1_num_1)
+        training_set.append(left_eye_sess_2_num_1)
         training_set_labels.append(label)
         training_set_labels.append(label)
 
+        # append 2nd eye from sess_1 to validation set and 2nd eye from sess_2 to testing set
+        # person 1
+        validation_set.append(left_eye_sess_1_num_2)
+        testing_set.append(left_eye_sess_2_num_2)
         validation_set_labels.append(label)
         testing_set_labels.append(label)
 
+        # do the same for person 2
+        label += 1
+        # append one eye from sess_1 and one eye from sess_2 to the training set
+        # person 2
+        training_set.append(right_eye_sess_1_num_1)
+        training_set.append(right_eye_sess_2_num_1)
+        training_set_labels.append(label)
+        training_set_labels.append(label)
+
+        # append 2nd eye from sess_1 to validation set and 2nd eye from sess_2 to testing set
+        # person 2
+        validation_set.append(right_eye_sess_1_num_2)
+        testing_set.append(right_eye_sess_2_num_2)
+        validation_set_labels.append(label)
+        testing_set_labels.append(label)
+
+        # increment label for next group of 8
         label += 1
 
-    # convert to numpy arrays
+    # convert to numpy arrays and scale the images by 255
     training_set = np.asarray(training_set, dtype=np.uint8).reshape((800, 128, 128))
     training_set = normalize(training_set)
     training_set_labels = np.asarray(training_set_labels, dtype=np.int).reshape(-1, 1)
