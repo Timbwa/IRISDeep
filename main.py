@@ -160,14 +160,14 @@ def main():
     # do_experiment([train_x, train_y, val_x, val_y, test_x, test_y], name='strides')
 
     # try best configuration with padding False,
-    current_best_model = m.create_model(init_num_kernels=4, init_kernel_size=5, num_conv_layers=3,
-                                        init_num_neurons_fc_layer=512,
-                                        num_of_fc_layers=2, strides=1, do_padding=False)
-
-    m.compile_model(current_best_model, learning_rate)
-    print(f'{print_equal()} Training {print_equal()}')
-    train(current_best_model, epochs, batch_size, train_x, train_y, val_x, val_y, exp_name='conv_3_fc_2_padd_false')
-    evaluate_model(current_best_model, test_x, test_y, f'conv_layers_{3}_padd_false')
+    # current_best_model = m.create_model(init_num_kernels=4, init_kernel_size=5, num_conv_layers=3,
+    #                                     init_num_neurons_fc_layer=512,
+    #                                     num_of_fc_layers=2, strides=1, do_padding=False)
+    #
+    # m.compile_model(current_best_model, learning_rate)
+    # print(f'{print_equal()} Training {print_equal()}')
+    # train(current_best_model, epochs, batch_size, train_x, train_y, val_x, val_y, exp_name='conv_3_fc_2_padd_false')
+    # evaluate_model(current_best_model, test_x, test_y, f'conv_layers_{3}_padd_false')
 
     # load and evaluate best model
     best_model = load_best_model()
