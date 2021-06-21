@@ -60,7 +60,8 @@ def main():
     test_y = np.load('test_y.npy')
 
     # create base model with 2 Conv layers and 1 fully-connected layer
-    base_model = m.create_model(num_extra_conv_layers=0, init_num_kernels=3, init_kernel_size=3)
+    base_model = m.create_model(init_num_kernels=4, init_kernel_size=3, num_conv_layers=2, init_num_neurons_fc_layer=512,
+                                num_of_fc_layers=2, strides=1, do_padding=True)
     learning_rate = 1e-3
     m.compile_model(base_model, learning_rate)
 
@@ -69,7 +70,7 @@ def main():
     batch_size = 32
 
     print(f'{print_equal()} Training {print_equal()}')
-    train(base_model, epochs, batch_size, train_x, train_y, val_x, val_y, exp_name='base_model')
+    # train(base_model, epochs, batch_size, train_x, train_y, val_x, val_y, exp_name='base_model')
     #
     # # evaluate model
     evaluate_model(base_model, test_x, test_y)
