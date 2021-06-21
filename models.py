@@ -23,7 +23,8 @@ def create_model(init_num_kernels=4, init_kernel_size=3, num_conv_layers=2, init
     # weight initializer
     initializer = tf.keras.initializers.he_normal(seed=SEED)
     # add at-least 2 convolutional layers
-    # 2 conv layers has stride of 1 so do zero-padding. padding='valid' means no zero-padding, 'same' means otherwise
+    # 2 conv layers has stride of 1 so do zero-padding. padding='valid' means no zero-padding, 'same' means padding
+    # with zeros where the output size is same as input
     num = 1
     for i in range(num_conv_layers):
         if do_padding:
