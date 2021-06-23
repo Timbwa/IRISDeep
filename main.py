@@ -106,8 +106,8 @@ def load_best_model():
     """
         Load best model from disk with the following configuration:
         convolutional_layers: 3
-        kernel sizes for the layers in order: 5x5, 3x3, 1x1
-        kernel number for the layers: 4, 8, 16
+        kernel sizes for the layers in order: 7x7, 5x5, 3x3
+        kernel number for the layers: 64, 1288, 256
         no-zero padding
         batch_norm & max_pool_layer after each conv layer
     """
@@ -118,7 +118,11 @@ def load_best_model():
 
 
 def main():
-    # get data from numpy arrays
+    # can retrieve arrays from acquisition.py
+    # train_x, train_y, val_x, val_y, test_x, test_y = aq.data_acquisition() # make sure the Database folder is in the
+    # same directory as the project
+
+    # get data from numpy arrays containing preprocessed images
     print('Reading data...')
     train_x = np.load('train_x.npy')
     train_y = np.load('train_y.npy')
@@ -133,9 +137,13 @@ def main():
     epochs = 250  # max epochs, early stopping may cause training to stop earlier
     batch_size = 32
 
+    """
+        Uncomment sections under '===' signs to run various experiments
+    """
+    # ============================ Create and test Base Model ======================================
     # create base model with 2 Conv layers and 1 fully-connected layer -> accuracy 75%
-    # base_model = m.create_model(init_num_kernels=4, init_kernel_size=3, num_conv_layers=2, init_num_neurons_fc_layer=512,
-    # num_of_fc_layers=2, strides=1, do_padding=True)
+    # base_model = m.create_model(init_num_kernels=4, init_kernel_size=3, num_conv_layers=2,
+#                                 init_num_neurons_fc_layer=512, num_of_fc_layers=2, strides=1, do_padding=True)
     #
     # m.compile_model(base_model, learning_rate)
 
@@ -145,35 +153,50 @@ def main():
     # #
     # # # evaluate model
     # evaluate_model(base_model, test_x, test_y)
+    # ===============================================================================================
 
-    # see the effect of increasing layers
+    # ============================== see the effect of increasing layers ============================
+
     # do_experiment([train_x, train_y, val_x, val_y, test_x, test_y], name='conv_layers')
 
-    # see effect of increasing fc layers
+    # ===============================================================================================
+
+    # ============================ see effect of increasing fc layers ================================
+
     # do_experiment([train_x, train_y, val_x, val_y, test_x, test_y], name='fc_layers', conv_layers=3, kernel_size=5)
     # do_experiment([train_x, train_y, val_x, val_y, test_x, test_y], name='fc_layers', conv_layers=4, kernel_size=7)
     # do_experiment([train_x, train_y, val_x, val_y, test_x, test_y], name='fc_layers', conv_layers=5, kernel_size=9)
     # do_experiment([train_x, train_y, val_x, val_y, test_x, test_y], name='fc_layers', conv_layers=6, kernel_size=11)
 
-    # see effect of increasing strides with current best config of 3 conv layers, init_strides = 1, fc_layers=2
+    # ================================================================================================
+
+    # === see effect of increasing strides with current best config of 3 conv layers, init_strides = 1, fc_layers=2 ====
     # increasing stride reduces the feature size, killing the accuracy
+
     # do_experiment([train_x, train_y, val_x, val_y, test_x, test_y], name='strides')
 
-    # try best configuration with padding False,
-    # current_best_model = m.create_model(init_num_kernels=4, init_kernel_size=5, num_conv_layers=3,
-    #                                     init_num_neurons_fc_layer=512,
-    #                                     num_of_fc_layers=2, strides=1, do_padding=False)
-    #
-    # m.compile_model(current_best_model, learning_rate)
-    # print(f'{print_equal()} Training {print_equal()}')
-    # train(current_best_model, epochs, batch_size, train_x, train_y, val_x, val_y, exp_name='conv_3_fc_2_padd_false')
-    # evaluate_model(current_best_model, test_x, test_y, f'conv_layers_{3}_padd_false')
+    # =================================================================================================
 
-    # load and evaluate best model
+    # ====================== train candidate best configuration with padding ======================
+
+    # best_model = m.create_model(init_num_kernels=64, init_kernel_size=7, num_conv_layers=3,
+    #                             init_num_neurons_fc_layer=512,
+    #                             num_of_fc_layers=1, strides=1, do_padding=False)
+    #
+    # m.compile_model(best_model, learning_rate)
+    # print(f'{print_equal()} Training {print_equal()}')
+    # train(best_model, epochs, batch_size, train_x, train_y, val_x, val_y, exp_name='best_model')
+    # evaluate_model(best_model, test_x, test_y, f'conv_layers_{3}_padd_false')
+
+    # ==============================================================================================
+
+    # ================================= load and evaluate best model ===============================
+
     best_model = load_best_model()
     # evaluate model
     evaluate_model(best_model, test_x, test_y, 'best_model')
 
+    # ==============================================================================================
 
 if __name__ == '__main__':
     main()
